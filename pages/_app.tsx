@@ -5,6 +5,7 @@ import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { ContractProvider } from '../contexts/ContracContext';
+import WalletConnect from '../components/WalletConnect';
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
@@ -24,15 +25,16 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         <link rel="shortcut icon" href="/favicon.svg" />
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </Head>
-
-      <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+      <WalletConnect>
         <ContractProvider>
-          <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
-            <Component {...pageProps} />
-            <Notifications />
-          </MantineProvider>
+          <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+            <MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
+              <Component {...pageProps} />
+              <Notifications />
+            </MantineProvider>
+          </ColorSchemeProvider>
         </ContractProvider>
-      </ColorSchemeProvider>
+      </WalletConnect>
     </>
   );
 }

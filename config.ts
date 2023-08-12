@@ -930,4 +930,4 @@ export const PRESALE_ABI = [
         "stateMutability": "nonpayable",
         "type": "function"
     }
-];
+]
