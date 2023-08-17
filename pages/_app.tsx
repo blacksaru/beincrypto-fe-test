@@ -4,8 +4,8 @@ import { getCookie, setCookie } from 'cookies-next';
 import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { ContractProvider } from '../contexts/ContracContext';
 import WalletConnect from '../components/WalletConnect';
+import { ContractProvider } from '../contexts/ContracContext';
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;

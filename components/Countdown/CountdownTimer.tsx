@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Paper, Text } from '@mantine/core';
 import { useContract } from '../../contexts/ContracContext';
-import { ethers } from 'ethers';
-import { RPC_URL } from '../../config';
+import { useBlockNumber, usePublicClient } from 'wagmi';
 
 interface CountdownTimerProps {
   targetTime: number;
@@ -13,20 +12,42 @@ const formatTimeSegment = (segment: number): string => {
 };
 
 const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
-  const [remainingTime, setRemainingTime] = useState<number>(0);
+  const publicClient = usePublicClient();
 
-  const { currentStageStartTimeStamp, stageBlocksDuration } = useContract();
-  const stageBlocksDurationDouble = stageBlocksDuration * 2;
-  const provider = new ethers.JsonRpcProvider(RPC_URL);
+  const [remainingTime, setRemainingTime] = useState<number>(0);
+  const blockNumberData = useBlockNumber();
+  const { STAGE_BLOCKS_DURATION, currentStageBlockStart } = useContract();
+  const STAGE_BLOCKS_DURATIONx2 = STAGE_BLOCKS_DURATION * 2;
 
   const getBlockInfo = async () => {
     // get remaining time
-    const blockNum = await provider.getBlockNumber();
-    const blockInfo = await provider.getBlock(blockNum);
-    if (blockInfo) {
-      const remain = currentStageStartTimeStamp + stageBlocksDurationDouble - blockInfo.timestamp;
-      setRemainingTime(remain * 1000);
+    // const blockInfo = await provider.getBlock(blockNum);
+    // if (blockInfo) {
+    // const remain = currentStageStartTimeStamp + STAGE_BLOCKS_DURATIONx2 - blockInfo.timestamp;
+    let nowTimestamp = 1692287616000;
+    let currentStageBlockStartTimestamp = 1692287616000;
+    if (currentStageBlockStart && currentStageBlockStart !== 0) {
+      await publicClient
+        .getBlock()
+        .then((data) => {
+          if (data) {
+            nowTimestamp = Number(data.timestamp) * 1000;
+          }
+        })
+        .catch((error) => console.log(error));
+      await publicClient
+        .getBlock()
+        .then((data) => {
+          if (data) {
+            console.log('------', data);
+            currentStageBlockStartTimestamp = Number(data.timestamp) * 1000;
+          }
+        })
+        .catch((error) => console.log(error));
     }
+    const remain = STAGE_BLOCKS_DURATIONx2 - nowTimestamp;
+    setRemainingTime(remain);
+    // }
   };
 
   useEffect(() => {
@@ -35,12 +56,12 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [targetTime]);
+  }, [currentStageBlockStart]);
 
   const hours = Math.floor(remainingTime / 3600000);
   const minutes = Math.floor((remainingTime % 3600000) / 60000);
   const seconds = Math.floor((remainingTime % 60000) / 1000);
-
+  const isReady = hours === 0 && minutes === 0 && seconds === 0;
   return (
     <Paper>
       <Text
@@ -52,15 +73,15 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
           lineHeight: 1,
         }}
       >
-        {hours >= 0 ? formatTimeSegment(hours) : '--'}
+        {!isReady ? formatTimeSegment(hours) : '--'}
         <Text component="span" size="md">
           H
         </Text>
-        {minutes >= 0 ? formatTimeSegment(minutes) : '--'}
+        {!isReady ? formatTimeSegment(minutes) : '--'}
         <Text component="span" size="md">
           M
         </Text>
-        {seconds >= 0 ? formatTimeSegment(seconds) : '--'}
+        {!isReady ? formatTimeSegment(seconds) : '--'}
         <Text component="span" size="md">
           S
         </Text>

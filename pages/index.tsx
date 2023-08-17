@@ -7,11 +7,9 @@ import { useContract } from '../contexts/ContracContext';
 import { useState, useEffect } from 'react';
 import { getAccount } from '@wagmi/core';
 import { InfoItem } from '../components/TokenInfo/InfoItem';
-import { ethers } from 'ethers';
 
 export default function HomePage() {
-  const { tokenContract, presaleContract, tokenDecimals, tokenSymbol, currentStageMaxAmount } =
-    useContract();
+  const { symbol, currentStageMaxAmount } = useContract();
   const [purchased, setPurchased] = useState(0);
   const [price, setPrice] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -19,13 +17,7 @@ export default function HomePage() {
 
   const getPrice = async () => {
     setLoading(true);
-    console.log(address);
-    if (presaleContract && tokenContract && address) {
-      const priceRes = await presaleContract.currentStagePrice();
-      const purchasedRes = await presaleContract.currentStageSoldAmount(address);
-      setPrice(Number(priceRes) / Math.pow(10, Number(tokenDecimals)));
-      setPurchased(Number(purchasedRes) / Math.pow(10, Number(tokenDecimals)));
-    }
+
     setLoading(false);
   };
   useEffect(() => {
@@ -45,11 +37,7 @@ export default function HomePage() {
     try {
       if (typeof amount === 'number' && amount > 0) {
         console.log(amount * 10 ** 18);
-        if (presaleContract) {
-          const res = await presaleContract.tokenSale(1000 * 10 ** 18, {
-            value: ethers.parseUnits('0.35', 'ether'),
-          });
-        }
+
         showNotification({
           title: 'Success',
           message: `Submitted amount: ${amount}`,
@@ -88,17 +76,12 @@ export default function HomePage() {
         </Flex>
         <Paper sx={{ maxWidth: 500 }} mx="auto" mt={40}>
           <InfoItem title="token price" value={price} loading={loading} token="MATIC" />
-          <InfoItem
-            title="purchased amount"
-            value={purchased}
-            loading={loading}
-            token={tokenSymbol}
-          />
+          <InfoItem title="purchased amount" value={purchased} loading={loading} token={symbol} />
           <InfoItem
             title="remaining amount"
             value={currentStageMaxAmount - purchased}
             loading={loading}
-            token={tokenSymbol}
+            token={symbol}
           />
           <Flex sx={{ width: '100%' }} gap={10}>
             <Input
@@ -153,15 +136,18 @@ export default function HomePage() {
             </Button>
           </Flex>
           <Flex align="center" justify="center" direction="column">
-            <Text my="sm" weight={700} size="sm">
-              You will pay {price * amount} MATIC
-            </Text>
+            {amount > 0 && (
+              <Text my="sm" weight={700} size="sm">
+                You will pay {price * amount} MATIC
+              </Text>
+            )}
             <Button
               uppercase
               gradient={{ from: '#8d1de2', to: '#2f819e' }}
               variant="gradient"
               size="md"
               loading={inProgress}
+              mt={20}
               sx={{
                 width: 200,
               }}
