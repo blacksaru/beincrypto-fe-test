@@ -4,25 +4,12 @@ import CountdownTimer from '../components/Countdown/CountdownTimer';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { showNotification } from '@mantine/notifications';
 import { useContract } from '../contexts/ContracContext';
-import { useState, useEffect } from 'react';
-import { getAccount } from '@wagmi/core';
+import { useState } from 'react';
 import { InfoItem } from '../components/TokenInfo/InfoItem';
 
 export default function HomePage() {
-  const { symbol, currentStageMaxAmount } = useContract();
+  const { symbol, currentStageMaxAmount, isFetching, currentStagePrice } = useContract();
   const [purchased, setPurchased] = useState(0);
-  const [price, setPrice] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const { address } = getAccount();
-
-  const getPrice = async () => {
-    setLoading(true);
-
-    setLoading(false);
-  };
-  useEffect(() => {
-    getPrice();
-  }, [address]);
 
   const [amount, setAmount] = useState(0);
 
@@ -75,12 +62,22 @@ export default function HomePage() {
           </Flex>
         </Flex>
         <Paper sx={{ maxWidth: 500 }} mx="auto" mt={40}>
-          <InfoItem title="token price" value={price} loading={loading} token="MATIC" />
-          <InfoItem title="purchased amount" value={purchased} loading={loading} token={symbol} />
+          <InfoItem
+            title="token price"
+            value={currentStagePrice}
+            loading={isFetching}
+            token="MATIC"
+          />
+          <InfoItem
+            title="purchased amount"
+            value={purchased}
+            loading={isFetching}
+            token={symbol}
+          />
           <InfoItem
             title="remaining amount"
             value={currentStageMaxAmount - purchased}
-            loading={loading}
+            loading={isFetching}
             token={symbol}
           />
           <Flex sx={{ width: '100%' }} gap={10}>
@@ -138,7 +135,7 @@ export default function HomePage() {
           <Flex align="center" justify="center" direction="column">
             {amount > 0 && (
               <Text my="sm" weight={700} size="sm">
-                You will pay {price * amount} MATIC
+                You will pay {currentStagePrice * amount} MATIC
               </Text>
             )}
             <Button

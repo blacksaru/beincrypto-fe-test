@@ -138,6 +138,11 @@ export const ContractProvider: React.FC<{ children: ReactNode }> = ({ children }
         abi: PRESALE_ABI as Abi,
         functionName: 'saleToken', // 15
       },
+      {
+        address: TOKEN_ADDRESS,
+        abi: TOKEN_ABI as Abi,
+        functionName: 'decimals', // 16
+      },
     ],
   });
 
@@ -153,7 +158,7 @@ export const ContractProvider: React.FC<{ children: ReactNode }> = ({ children }
     currentStageAvailableAmount: data ? Number(data[8].result) : 0,
     currentStageBlockStart: data ? Number(data[9].result) : 0,
     currentStageMaxAmount: data ? Number(data[10].result) : 0,
-    currentStagePrice: data ? Number(data[11].result) : 0,
+    currentStagePrice: data ? Number(data[11].result) / 10 ** Number(data[16].result) : 0,
     currentStageSoldAmount: data ? Number(data[12].result) : 0,
     owner: data ? (data[13].result as string) : '',
     paused: data ? (data[14].result as boolean) : false,

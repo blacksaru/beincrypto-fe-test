@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Paper, Text } from '@mantine/core';
 import { useContract } from '../../contexts/ContracContext';
-import { useBlockNumber, usePublicClient } from 'wagmi';
-import ethers from 'ethers';
+import { usePublicClient } from 'wagmi';
+import { ethers } from 'ethers';
 import { RPC_URL } from '../../config';
 
 interface CountdownTimerProps {
@@ -29,12 +29,12 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
         .getBlock()
         .then((data) => {
           if (data) {
-            nowTimestamp = Number(data.timestamp) * 1000;
+            nowTimestamp = Number(data.timestamp);
           }
         })
         .catch((error) => console.log(error));
       if (blockInfo) {
-        const remain = blockInfo.timestamp - STAGE_BLOCKS_DURATIONx2 - nowTimestamp;
+        const remain = blockInfo.timestamp + STAGE_BLOCKS_DURATIONx2 - nowTimestamp;
         setRemainingTime(remain);
       }
     }
@@ -49,10 +49,10 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
     return () => clearInterval(interval);
   }, [currentStageBlockStart]);
 
-  const hours = Math.floor(remainingTime / 3600000);
-  const minutes = Math.floor((remainingTime % 3600000) / 60000);
-  const seconds = Math.floor((remainingTime % 60000) / 1000);
-  const isReady = hours === 0 && minutes === 0 && seconds === 0;
+  const hours = Math.floor(remainingTime / 3600);
+  const minutes = Math.floor((remainingTime % 3600) / 60);
+  const seconds = Math.floor((remainingTime % 60) / 1);
+  const isReady = hours >= 0 && minutes >= 0 && seconds >= 0;
   return (
     <Paper>
       <Text
@@ -64,15 +64,15 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
           lineHeight: 1,
         }}
       >
-        {!isReady ? formatTimeSegment(hours) : '--'}
+        {isReady ? formatTimeSegment(hours) : '--'}
         <Text component="span" size="md">
           H
         </Text>
-        {!isReady ? formatTimeSegment(minutes) : '--'}
+        {isReady ? formatTimeSegment(minutes) : '--'}
         <Text component="span" size="md">
           M
         </Text>
-        {!isReady ? formatTimeSegment(seconds) : '--'}
+        {isReady ? formatTimeSegment(seconds) : '--'}
         <Text component="span" size="md">
           S
         </Text>
