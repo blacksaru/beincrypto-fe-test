@@ -24,7 +24,6 @@ export default function HomePage() {
     try {
       if (typeof amount === 'number' && amount > 0) {
         console.log(amount * 10 ** 18);
-
         showNotification({
           title: 'Success',
           message: `Submitted amount: ${amount}`,
