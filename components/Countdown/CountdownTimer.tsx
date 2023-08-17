@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Paper, Text } from '@mantine/core';
 import { useContract } from '../../contexts/ContracContext';
 import { useBlockNumber, usePublicClient } from 'wagmi';
+import ethers from 'ethers';
+import { RPC_URL } from '../../config';
 
 interface CountdownTimerProps {
   targetTime: number;
@@ -15,18 +17,14 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
   const publicClient = usePublicClient();
 
   const [remainingTime, setRemainingTime] = useState<number>(0);
-  const blockNumberData = useBlockNumber();
   const { STAGE_BLOCKS_DURATION, currentStageBlockStart } = useContract();
   const STAGE_BLOCKS_DURATIONx2 = STAGE_BLOCKS_DURATION * 2;
 
   const getBlockInfo = async () => {
-    // get remaining time
-    // const blockInfo = await provider.getBlock(blockNum);
-    // if (blockInfo) {
-    // const remain = currentStageStartTimeStamp + STAGE_BLOCKS_DURATIONx2 - blockInfo.timestamp;
+    const provider = new ethers.JsonRpcProvider(RPC_URL);
     let nowTimestamp = 1692287616000;
-    let currentStageBlockStartTimestamp = 1692287616000;
     if (currentStageBlockStart && currentStageBlockStart !== 0) {
+      const blockInfo = await provider.getBlock(currentStageBlockStart);
       await publicClient
         .getBlock()
         .then((data) => {
@@ -35,18 +33,11 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
           }
         })
         .catch((error) => console.log(error));
-      await publicClient
-        .getBlock()
-        .then((data) => {
-          if (data) {
-            console.log('------', data);
-            currentStageBlockStartTimestamp = Number(data.timestamp) * 1000;
-          }
-        })
-        .catch((error) => console.log(error));
+      if (blockInfo) {
+        const remain = blockInfo.timestamp - STAGE_BLOCKS_DURATIONx2 - nowTimestamp;
+        setRemainingTime(remain);
+      }
     }
-    const remain = STAGE_BLOCKS_DURATIONx2 - nowTimestamp;
-    setRemainingTime(remain);
     // }
   };
 
