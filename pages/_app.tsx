@@ -6,7 +6,6 @@ import { MantineProvider, ColorScheme, ColorSchemeProvider } from '@mantine/core
 import { Notifications } from '@mantine/notifications';
 import WalletConnect from '../components/WalletConnect';
 import { ContractProvider } from '../contexts/ContracContext';
-import WalletConnect from '../components/WalletConnect';
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
