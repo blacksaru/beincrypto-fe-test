@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import { Paper, Text } from '@mantine/core';
 import { useContract } from '../../contexts/ContracContext';
 import { usePublicClient } from 'wagmi';
@@ -52,30 +53,28 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetTime }) => {
   const hours = Math.floor(remainingTime / 3600);
   const minutes = Math.floor((remainingTime % 3600) / 60);
   const seconds = Math.floor((remainingTime % 60) / 1);
-  const isReady = hours >= 0 && minutes >= 0 && seconds >= 0;
+  const isReady = hours !== 0 && minutes !== 0 && seconds !== 0;
+
+  const formattedTimeSegments = [
+    { value: hours, label: 'H' },
+    { value: minutes, label: 'M' },
+    { value: seconds, label: 'S' },
+  ];
+
   return (
     <Paper>
       <Text
         align="center"
-        sx={{
-          fontSize: 60,
-          fontWeight: 700,
-          fontFamily: 'Inter',
-          lineHeight: 1,
-        }}
+        sx={{ fontSize: 60, fontWeight: 700, fontFamily: 'Inter', lineHeight: 1 }}
       >
-        {isReady ? formatTimeSegment(hours) : '--'}
-        <Text component="span" size="md">
-          H
-        </Text>
-        {isReady ? formatTimeSegment(minutes) : '--'}
-        <Text component="span" size="md">
-          M
-        </Text>
-        {isReady ? formatTimeSegment(seconds) : '--'}
-        <Text component="span" size="md">
-          S
-        </Text>
+        {formattedTimeSegments.map(({ value, label }) => (
+          <React.Fragment key={label}>
+            {isReady ? formatTimeSegment(value) : '--'}
+            <Text component="span" size="md">
+              {label}
+            </Text>
+          </React.Fragment>
+        ))}
       </Text>
     </Paper>
   );

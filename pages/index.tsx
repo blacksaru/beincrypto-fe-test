@@ -1,4 +1,4 @@
-import { Grid, Container, Flex, Input, Paper, Text, Button } from '@mantine/core';
+import { Container, Flex, Input, Paper, Text, Button } from '@mantine/core';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import CountdownTimer from '../components/Countdown/CountdownTimer';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -8,8 +8,8 @@ import { useState } from 'react';
 import { InfoItem } from '../components/TokenInfo/InfoItem';
 
 export default function HomePage() {
-  const { symbol, currentStageMaxAmount, isFetching, currentStagePrice } = useContract();
-  const [purchased, setPurchased] = useState(0);
+  const { symbol, currentStageMaxAmount, isFetching, currentStagePrice, currentStageSoldAmount } =
+    useContract();
 
   const [amount, setAmount] = useState(0);
 
@@ -69,13 +69,13 @@ export default function HomePage() {
           />
           <InfoItem
             title="purchased amount"
-            value={purchased}
+            value={currentStageSoldAmount}
             loading={isFetching}
             token={symbol}
           />
           <InfoItem
             title="remaining amount"
-            value={currentStageMaxAmount - purchased}
+            value={currentStageMaxAmount - currentStageSoldAmount}
             loading={isFetching}
             token={symbol}
           />
@@ -86,7 +86,7 @@ export default function HomePage() {
               size="md"
               h={42}
               value={amount}
-              max={currentStageMaxAmount - purchased}
+              max={currentStageMaxAmount - currentStageSoldAmount}
               onChange={handleAmountChange}
               styles={(theme: any) => ({
                 input: {
@@ -127,7 +127,10 @@ export default function HomePage() {
             <Button w="20%" onClick={() => setAmount(50000)}>
               50K
             </Button>
-            <Button w="20%" onClick={() => setAmount(currentStageMaxAmount - purchased)}>
+            <Button
+              w="20%"
+              onClick={() => setAmount(currentStageMaxAmount - currentStageSoldAmount)}
+            >
               MAX
             </Button>
           </Flex>
