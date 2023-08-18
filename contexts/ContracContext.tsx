@@ -21,6 +21,7 @@ interface ContractContextProps {
   paused: boolean;
   saleToken: string;
   isFetching: boolean;
+  refetch: Function;
 }
 
 const ContractContext = createContext<ContractContextProps>({
@@ -41,6 +42,7 @@ const ContractContext = createContext<ContractContextProps>({
   paused: false,
   saleToken: '',
   isFetching: false,
+  refetch: () => {},
 });
 
 export const useContract = () => {
@@ -54,7 +56,7 @@ export const useContract = () => {
 export const ContractProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { address } = getAccount();
 
-  const { data, isFetching, status } = useContractReads({
+  const { data, isFetching, status, refetch } = useContractReads({
     contracts: [
       {
         address: TOKEN_ADDRESS,
@@ -164,13 +166,12 @@ export const ContractProvider: React.FC<{ children: ReactNode }> = ({ children }
     saleToken: data ? (data[15].result as unknown as string) : '',
   };
 
-  console.log(values);
-
   return (
     <ContractContext.Provider
       value={{
         ...values,
         isFetching,
+        refetch,
       }}
     >
       {children}
