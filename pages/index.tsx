@@ -1,11 +1,10 @@
+import { useState } from 'react';
 import { Container, Flex, Input, Paper, Text, Button } from '@mantine/core';
-import { getAccount } from '@wagmi/core';
+import { showNotification } from '@mantine/notifications';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import CountdownTimer from '../components/Countdown/CountdownTimer';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { showNotification } from '@mantine/notifications';
 import { useContract } from '../contexts/ContracContext';
-import { useState } from 'react';
 import { InfoItem } from '../components/TokenInfo/InfoItem';
 import { useContractWrite, useAccount } from 'wagmi';
 import { PRESALE_ABI, PRESALE_ADDRESS } from '../config';
@@ -37,9 +36,7 @@ export default function HomePage() {
         message: `Purchased amount: ${amount}`,
         color: 'teal',
       });
-      // setTimeout(() => {
       refetch();
-      // }, 2000);
     },
   });
 
@@ -47,10 +44,7 @@ export default function HomePage() {
     setAmount(event.target.value as unknown as number);
   };
 
-  const [inProgress, setInProgress] = useState(false);
-
   const handlePurchase = async () => {
-    setInProgress(true);
     try {
       if (typeof amount === 'number' && amount > 0) {
         console.log("amount * 10 ** 18 + 'n'", amount * 10 ** 18 + 'n');
@@ -67,10 +61,7 @@ export default function HomePage() {
       }
     } catch (error) {
       console.log(error);
-      setInProgress(false);
     }
-
-    setInProgress(false);
   };
 
   const amountButtons = [
@@ -138,21 +129,23 @@ export default function HomePage() {
                   })}
                   sx={{
                     textAlign: 'right',
-                    width: 'calc(100% - 200px)',
+                    width: 'calc(100% - 140px)',
                   }}
                   type="number"
                 />
-                <Flex gap="sm" w={200}>
+                <Flex gap="sm" w={140}>
                   <Button
                     w="50%"
                     onClick={() => setAmount((prev) => prev / 2)}
                     h={42}
+                    px={0}
                     disabled={tokenSale.isLoading}
                   >
                     1/2
                   </Button>
                   <Button
                     w="50%"
+                    px={0}
                     onClick={() => setAmount((prev) => prev * 2)}
                     h={42}
                     disabled={tokenSale.isLoading}
@@ -167,6 +160,7 @@ export default function HomePage() {
                     w="20%"
                     onClick={() => setAmount(item.amount)}
                     disabled={tokenSale.isLoading}
+                    px={0}
                   >
                     {item.label}
                   </Button>
